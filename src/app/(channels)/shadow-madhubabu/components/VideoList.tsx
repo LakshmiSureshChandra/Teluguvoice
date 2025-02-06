@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import Link from 'next/link';
+import Image from 'next/image';
+
 interface Video {
   id: string;
   title: string;
@@ -27,7 +30,13 @@ export default function VideoList({ allVideos }: VideoListProps) {
     const matchesSearch =
       video.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       video.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesType = activeTab === "shorts" ? video.isShort : !video.isShort;
+    
+    // Updated shorts detection logic
+    const isShortVideo = video.title.toLowerCase().includes('#shorts') || 
+                        video.description.toLowerCase().includes('#shorts') ||
+                        video.isShort;
+    
+    const matchesType = activeTab === "shorts" ? isShortVideo : !isShortVideo;
     return matchesSearch && matchesType;
   });
 
@@ -71,34 +80,80 @@ export default function VideoList({ allVideos }: VideoListProps) {
 
   return (
     <>
-      {/* Tab buttons */}
-      <div className="flex justify-center gap-4 mb-4">
-        <button
-          onClick={() => {
-            setActiveTab("long");
-            setCurrentPage(1);
-          }}
-          className={`px-6 py-2 rounded-full transition-colors ${
-            activeTab === "long"
-              ? "bg-white/20 text-white border border-white/50"
-              : "bg-white/10 text-gray-400 hover:bg-white/15 hover:text-white"
-          }`}
-        >
-          Full Episodes
-        </button>
-        <button
-          onClick={() => {
-            setActiveTab("shorts");
-            setCurrentPage(1);
-          }}
-          className={`px-6 py-2 rounded-full transition-colors ${
-            activeTab === "shorts"
-              ? "bg-white/20 text-white border border-white/50"
-              : "bg-white/10 text-gray-400 hover:bg-white/15 hover:text-white"
-          }`}
-        >
-          Shorts
-        </button>
+      {/* Tab buttons with navigation */}
+      {/* Tab buttons with navigation */}
+      <div className="flex justify-center items-center gap-4 mb-4">
+        <div className="flex items-center gap-4">
+          <Link
+            href="/"
+            className="p-2.5 rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+              />
+            </svg>
+          </Link>
+          <button
+            onClick={() => {
+              setActiveTab("long");
+              setCurrentPage(1);
+            }}
+            className={`px-6 py-2 rounded-full transition-colors ${
+              activeTab === "long"
+                ? "bg-white/20 text-white border border-white/50"
+                : "bg-white/10 text-gray-400 hover:bg-white/15 hover:text-white"
+            }`}
+          >
+            Full Episodes
+          </button>
+          <button
+            onClick={() => {
+              setActiveTab("shorts");
+              setCurrentPage(1);
+            }}
+            className={`px-6 py-2 rounded-full transition-colors ${
+              activeTab === "shorts"
+                ? "bg-white/20 text-white border border-white/50"
+                : "bg-white/10 text-gray-400 hover:bg-white/15 hover:text-white"
+            }`}
+          >
+            Shorts
+          </button>
+          <Link
+            href="/facts-hive"
+            className="w-10 h-10 rounded-full overflow-hidden hover:scale-110 transition-transform duration-300 shadow-lg hover:shadow-xl"
+          >
+            <Image
+              src="/facts hive 2.png"
+              alt="Facts Hive"
+              width={40}
+              height={40}
+              className="w-full h-full object-cover"
+            />
+          </Link>
+          <Link
+            href="/voice-of-maheedhar"
+            className="w-10 h-10 rounded-full overflow-hidden hover:scale-110 transition-transform duration-300 shadow-lg hover:shadow-xl"
+          >
+            <Image
+              src="/Logo Square 2.png"
+              alt="Voice of Maheedhar"
+              width={40}
+              height={40}
+              className="w-full h-full object-cover"
+            />
+          </Link>
+        </div>
       </div>
 
       {/* Search Bar */}

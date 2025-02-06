@@ -76,20 +76,18 @@ export const metadata: Metadata = {
   },
 };
 
+import ContactButton from '@/components/ContactButton';
+
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <html lang="te">
-      <head>
-        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-      </head>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
+      <body>
         {children}
+        <ContactButton />
       </body>
     </html>
   );

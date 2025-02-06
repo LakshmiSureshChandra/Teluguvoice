@@ -49,22 +49,22 @@ export default function Home() {
         <div className="flex flex-col sm:flex-row gap-8 justify-center items-stretch relative max-w-6xl mx-auto">
           <Link
             href="/voice-of-maheedhar"
-            className="group flex-1 transform hover:-translate-y-2 transition-all duration-300 p-6 rounded-3xl bg-[#1E293B]/30 backdrop-blur-sm hover:bg-[#1E293B]/40 text-white shadow-[0_8px_30px_rgba(30,41,59,0.2)] hover:shadow-[0_20px_40px_rgba(30,41,59,0.3)] flex flex-col items-center gap-6"
+            className="group flex-1 transform hover:-translate-y-2 transition-all duration-300 p-6 rounded-3xl bg-[#2A4365]/50 backdrop-blur-md hover:bg-[#2A4365]/70 text-white shadow-[0_8px_30px_rgba(30,41,59,0.3),_0_0_15px_rgba(226,232,240,0.15)] hover:shadow-[0_20px_40px_rgba(30,41,59,0.5),_0_0_25px_rgba(226,232,240,0.25)] flex flex-col items-center gap-6"
           >
-            <div className="relative p-1 bg-gradient-to-r from-[#E2E8F0] to-[#94A3B8] rounded-full">
+            <div className="relative p-1 bg-gradient-to-r from-[#E2E8F0] to-[#94A3B8] rounded-full group-hover:from-[#F8FAFC] group-hover:to-[#CBD5E1] transition-all duration-300">
               <Image
                 src="/Logo Square 2.png"
                 alt="Voice of Maheedhar"
                 width={180}
                 height={180}
-                className="rounded-full"
+                className="rounded-full transform group-hover:scale-105 transition-all duration-300"
               />
             </div>
             <div className="space-y-3">
-              <h2 className="text-2xl font-bold text-[#E2E8F0]">
+              <h2 className="text-2xl font-bold text-[#E2E8F0] group-hover:text-white transition-colors duration-300">
                 Voice of Maheedhar
               </h2>
-              <p className="text-[#94A3B8]">Spiritual and devotional content</p>
+              <p className="text-[#94A3B8] group-hover:text-[#CBD5E1] transition-colors duration-300">Spiritual and devotional content</p>
             </div>
           </Link>
 
@@ -92,22 +92,22 @@ export default function Home() {
 
           <Link
             href="/shadow-madhubabu"
-            className="group flex-1 transform hover:-translate-y-2 transition-all duration-300 p-6 rounded-3xl bg-black/20 backdrop-blur-sm hover:bg-black/30 text-white shadow-[0_8px_30px_rgba(0,0,0,0.2)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.3)] flex flex-col items-center gap-6"
+            className="group flex-1 transform hover:-translate-y-2 transition-all duration-300 p-6 rounded-3xl bg-[#2C2C2C]/50 backdrop-blur-md hover:bg-[#2C2C2C]/70 text-white shadow-[0_8px_30px_rgba(75,75,75,0.3),_0_0_15px_rgba(255,255,255,0.1)] hover:shadow-[0_20px_40px_rgba(75,75,75,0.4),_0_0_25px_rgba(255,255,255,0.15)] flex flex-col items-center gap-6"
           >
-            <div className="relative p-1 bg-gradient-to-r from-white/80 to-gray-400 rounded-full">
+            <div className="relative p-1 bg-gradient-to-r from-[#4A4A4A] to-[#2C2C2C] rounded-full group-hover:from-[#666666] group-hover:to-[#404040] transition-all duration-300">
               <Image
                 src="/Profile Pic.jpg"
                 alt="Shadow Madhubabu Audiobooks"
                 width={180}
                 height={180}
-                className="rounded-full grayscale hover:grayscale-0 transition-all duration-300"
+                className="rounded-full grayscale hover:grayscale-0 transform group-hover:scale-105 transition-all duration-300"
               />
             </div>
             <div className="space-y-3">
-              <h2 className="text-2xl font-bold text-white">
+              <h2 className="text-2xl font-bold text-[#CCCCCC] group-hover:text-white transition-colors duration-300">
                 Shadow Madhubabu Audiobooks
               </h2>
-              <p className="text-gray-400">Mystery and thriller audiobooks</p>
+              <p className="text-[#808080] group-hover:text-[#A3A3A3] transition-colors duration-300">Mystery and thriller audiobooks</p>
             </div>
           </Link>
         </div>
