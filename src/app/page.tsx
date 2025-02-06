@@ -48,27 +48,6 @@ export default function Home() {
 
         <div className="flex flex-col sm:flex-row gap-8 justify-center items-stretch relative max-w-6xl mx-auto">
           <Link
-            href="/shadow-madhubabu"
-            className="group flex-1 transform hover:-translate-y-2 transition-all duration-300 p-6 rounded-3xl bg-black/20 backdrop-blur-sm hover:bg-black/30 text-white shadow-[0_8px_30px_rgba(0,0,0,0.2)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.3)] flex flex-col items-center gap-6"
-          >
-            <div className="relative p-1 bg-gradient-to-r from-white/80 to-gray-400 rounded-full">
-              <Image
-                src="/Profile Pic.jpg"
-                alt="Shadow Madhubabu Audiobooks"
-                width={180}
-                height={180}
-                className="rounded-full grayscale hover:grayscale-0 transition-all duration-300"
-              />
-            </div>
-            <div className="space-y-3">
-              <h2 className="text-2xl font-bold text-white">
-                Shadow Madhubabu Audiobooks
-              </h2>
-              <p className="text-gray-400">Mystery and thriller audiobooks</p>
-            </div>
-          </Link>
-
-          <Link
             href="/voice-of-maheedhar"
             className="group flex-1 transform hover:-translate-y-2 transition-all duration-300 p-6 rounded-3xl bg-[#1E293B]/30 backdrop-blur-sm hover:bg-[#1E293B]/40 text-white shadow-[0_8px_30px_rgba(30,41,59,0.2)] hover:shadow-[0_20px_40px_rgba(30,41,59,0.3)] flex flex-col items-center gap-6"
           >
@@ -108,6 +87,27 @@ export default function Home() {
               <p className="text-[#FFE5D9]">
                 Fascinating facts and knowledge sharing
               </p>
+            </div>
+          </Link>
+
+          <Link
+            href="/shadow-madhubabu"
+            className="group flex-1 transform hover:-translate-y-2 transition-all duration-300 p-6 rounded-3xl bg-black/20 backdrop-blur-sm hover:bg-black/30 text-white shadow-[0_8px_30px_rgba(0,0,0,0.2)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.3)] flex flex-col items-center gap-6"
+          >
+            <div className="relative p-1 bg-gradient-to-r from-white/80 to-gray-400 rounded-full">
+              <Image
+                src="/Profile Pic.jpg"
+                alt="Shadow Madhubabu Audiobooks"
+                width={180}
+                height={180}
+                className="rounded-full grayscale hover:grayscale-0 transition-all duration-300"
+              />
+            </div>
+            <div className="space-y-3">
+              <h2 className="text-2xl font-bold text-white">
+                Shadow Madhubabu Audiobooks
+              </h2>
+              <p className="text-gray-400">Mystery and thriller audiobooks</p>
             </div>
           </Link>
         </div>
