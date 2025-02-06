@@ -12,60 +12,54 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-import { Dancing_Script } from 'next/font/google';
-
-const dancingScript = Dancing_Script({ subsets: ['latin'] });
-
 export const metadata: Metadata = {
-  metadataBase: new URL('https://teluguvoice.vercel.app'),
+  metadataBase: new URL("https://teluguvoice.vercel.app"),
   title: {
-    template: '%s | Telugu Voice',
-    default: 'Telugu Voice - Premium Telugu Content Hub'
+    template: "%s | Telugu Voice",
+    default: "Telugu Voice - Premium Telugu Content Hub",
   },
   icons: {
     icon: [
-      { url: '/favicon.svg', type: 'image/svg+xml' },
-      { url: '/favicon.ico', type: 'image/x-icon' },
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon.ico", type: "image/x-icon" },
     ],
-    shortcut: '/favicon.svg',
-    apple: '/apple-touch-icon.png',
+    shortcut: "/favicon.svg",
+    apple: "/apple-touch-icon.png",
     other: {
-      rel: 'mask-icon',
-      url: '/favicon.svg',
-      color: '#0c1b33'
-    }
+      rel: "mask-icon",
+      url: "/favicon.svg",
+      color: "#0c1b33",
+    },
   },
-  description: 'Your premier destination for Telugu audiobooks, spiritual content, and knowledge sharing. Featuring Shadow Madhubabu, Voice of Maheedhar, and Facts Hive.',
-  keywords: 'Telugu content, Telugu audiobooks, Telugu spiritual content, Telugu knowledge sharing, Telugu Voice',
-  authors: [{ name: 'Telugu Voice' }],
-  creator: 'Telugu Voice',
-  publisher: 'Telugu Voice',
+  description:
+    "Your premier destination for Telugu audiobooks, spiritual content, and knowledge sharing. Featuring Shadow Madhubabu, Voice of Maheedhar, and Facts Hive.",
+  keywords:
+    "Telugu content, Telugu audiobooks, Telugu spiritual content, Telugu knowledge sharing, Telugu Voice",
+  authors: [{ name: "Telugu Voice" }],
+  creator: "Telugu Voice",
+  publisher: "Telugu Voice",
   formatDetection: {
     email: false,
     address: false,
     telephone: false,
   },
-  icons: {
-    icon: '/favicon.ico',
-    shortcut: '/favicon-16x16.png',
-    apple: '/apple-touch-icon.png',
-  },
-  manifest: '/site.webmanifest',
+  manifest: "/site.webmanifest",
   openGraph: {
-    type: 'website',
-    locale: 'te_IN',
-    url: 'https://teluguvoice.vercel.app',
-    title: 'Telugu Voice - Premium Telugu Content Hub',
-    description: 'Discover the best Telugu content - audiobooks, spiritual content, and fascinating facts.',
-    siteName: 'Telugu Voice',
+    type: "website",
+    locale: "te_IN",
+    url: "https://teluguvoice.vercel.app",
+    title: "Telugu Voice - Premium Telugu Content Hub",
+    description:
+      "Discover the best Telugu content - audiobooks, spiritual content, and fascinating facts.",
+    siteName: "Telugu Voice",
   },
   twitter: {
-    card: 'summary_large_image',
-    title: 'Telugu Voice',
-    description: 'Your premier destination for Telugu content',
+    card: "summary_large_image",
+    title: "Telugu Voice",
+    description: "Your premier destination for Telugu content",
   },
   viewport: {
-    width: 'device-width',
+    width: "device-width",
     initialScale: 1,
     maximumScale: 1,
   },
@@ -75,9 +69,9 @@ export const metadata: Metadata = {
     googleBot: {
       index: true,
       follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
     },
   },
 };
