@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Dancing_Script } from "next/font/google";
 import { Metadata } from "next";
+import { getChannelStats } from "@/lib/youtube";
 
 const dancingScript = Dancing_Script({ subsets: ["latin"] });
 
@@ -28,12 +29,32 @@ export const metadata: Metadata = {
 };
 
 // Add the script to your page component
-export default function Home() {
+// Add this function to format numbers
+function formatNumber(num: string): string {
+  const n = parseInt(num);
+  if (n >= 1000000) {
+    return `${(n / 1000000).toFixed(1)}M`;
+  }
+  if (n >= 1000) {
+    return `${(n / 1000).toFixed(1)}K`;
+  }
+  return n.toString();
+}
+
+// Update the Home component to be async
+export default async function Home() {
+  // Fetch subscriber counts
+  const [maheedharStats, factsHiveStats, shadowStats] = await Promise.all([
+    getChannelStats("UCSt52ackN3gdHpNsdhdNfzQ"),
+    getChannelStats("UCPEkU0NHJMC2lm77hHncNqw"),
+    getChannelStats("UCezP-lhxuxfRrZJlMFX8naQ"),
+  ]);
+
   return (
     <div className="min-h-screen bg-[#0c1b33] flex items-center">
       <div className="absolute inset-0 bg-[url('/kolam-pattern.svg')] bg-repeat-x bg-top opacity-10"></div>
 
-      <main className="relative container mx-auto px-6 text-center">
+      <main className="relative container mx-auto px-6 text-center my-20">
         <h1
           className={`text-6xl md:text-7xl font-bold mb-6 relative ${dancingScript.className}`}
         >
@@ -64,7 +85,12 @@ export default function Home() {
               <h2 className="text-2xl font-bold text-[#E2E8F0] group-hover:text-white transition-colors duration-300">
                 Voice of Maheedhar
               </h2>
-              <p className="text-[#94A3B8] group-hover:text-[#CBD5E1] transition-colors duration-300">Spiritual and devotional content</p>
+              <p className="text-[#94A3B8] group-hover:text-[#CBD5E1] transition-colors duration-300">
+                Spiritual and devotional content
+              </p>
+              <p className="text-[#94A3B8] group-hover:text-[#CBD5E1] transition-colors duration-300 text-sm">
+                {formatNumber(maheedharStats.subscriberCount)} subscribers
+              </p>
             </div>
           </Link>
 
@@ -87,6 +113,9 @@ export default function Home() {
               <p className="text-[#FFE5D9]">
                 Fascinating facts and knowledge sharing
               </p>
+              <p className="text-[#FFE5D9] text-sm">
+                {formatNumber(factsHiveStats.subscriberCount)} subscribers
+              </p>
             </div>
           </Link>
 
@@ -104,10 +133,15 @@ export default function Home() {
               />
             </div>
             <div className="space-y-3">
-              <h2 className="text-2xl font-bold text-[#CCCCCC] group-hover:text-white transition-colors duration-300">
-                Shadow Madhubabu Audiobooks
+              <h2 className="text-xl font-bold text-[#CCCCCC] group-hover:text-white transition-colors duration-300">
+                Shadow Madhubabu audiobooks
               </h2>
-              <p className="text-[#808080] group-hover:text-[#A3A3A3] transition-colors duration-300">Mystery and thriller audiobooks</p>
+              <p className="text-[#808080] group-hover:text-[#A3A3A3] transition-colors duration-300">
+                Mystery and thriller audiobooks
+              </p>
+              <p className="text-[#808080] group-hover:text-[#A3A3A3] transition-colors duration-300 text-sm">
+                {formatNumber(shadowStats.subscriberCount)} subscribers
+              </p>
             </div>
           </Link>
         </div>

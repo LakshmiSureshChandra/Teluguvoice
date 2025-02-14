@@ -1,10 +1,161 @@
 import { google, youtube_v3 } from "googleapis"; // Import youtube_v3 to use the type for the response
 
-export async function getYoutubeData(channelHandle: string) {
+
+    // Type Definitions
+    // Move VideoData type to the top level
+    // Add export to the VideoData type at the top level
+    export type VideoData = {
+      id: string;
+      title: string;
+      description: string;
+      thumbnail: string;
+      publishedAt: string;
+      month: string;
+      year: number;
+      isShort: boolean;
+      url: string;
+      duration: string;
+      viewCount: string;
+      likeCount: string;
+    };
+// Add this type at the top with other type definitions
+// Separate types for different cache data types
+type YoutubeDataResponse = {
+  videos: unknown[];
+  allVideos: unknown[];
+  videosByCategory: Record<string, unknown[]>;
+  groupedVideos: Record<string, unknown>;
+  pagination?: {
+    totalVideos: number;
+    videosPerPage: number;
+    totalPages: number;
+    currentPage: number;
+  };
+  error?: string | null;
+};
+
+type ChannelStats = {
+  subscriberCount: string;
+  videoCount: string;
+  viewCount: string;
+};
+
+type CacheData<T> = {
+  timestamp: number;
+  data: T;
+};
+
+// Separate caches for different types of data
+const statsCache: { [key: string]: CacheData<ChannelStats> } = {};
+const dataCache: { [key: string]: CacheData<YoutubeDataResponse> } = {};
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
+
+// Update cache functions to be type-safe
+function isCacheValid(key: string, isStats: boolean = false): boolean {
+  const cacheEntry = isStats ? statsCache[key] : dataCache[key];
+  if (!cacheEntry) {
+    console.log(`Cache miss for ${key}`);
+    return false;
+  }
+  const isValid = Date.now() - cacheEntry.timestamp < CACHE_DURATION;
+  console.log(`Cache ${isValid ? 'hit' : 'expired'} for ${key}`);
+  return isValid;
+}
+
+// Update the setCacheData function with constrained generic type
+// Update setCacheData to handle different cache types correctly
+function setCacheData(
+  key: string,
+  data: YoutubeDataResponse | ChannelStats,
+  isStats: boolean = false
+): void {
+  if (isStats) {
+    statsCache[key] = {
+      timestamp: Date.now(),
+      data: data as ChannelStats,
+    };
+  } else {
+    dataCache[key] = {
+      timestamp: Date.now(),
+      data: data as YoutubeDataResponse,
+    };
+  }
+  console.log(`Cache updated for ${key}`);
+}
+
+// Update getCachedData to be type-safe
+function getCachedData<T extends YoutubeDataResponse | ChannelStats>(
+  key: string,
+  isStats: boolean = false
+): T | undefined {
+  const cache = isStats ? statsCache[key] : dataCache[key];
+  return cache?.data as T;
+}
+
+export function getCacheTimestamp(key: string, isStats: boolean = false): number {
+  const cache = isStats ? statsCache : dataCache;
+  return cache[key]?.timestamp || Date.now();
+}
+
+export async function getChannelStats(channelId: string): Promise<ChannelStats> {
+  const cacheKey = `stats_${channelId}`;
+  if (isCacheValid(cacheKey, true)) {
+    return getCachedData<ChannelStats>(cacheKey, true)!;
+  }
+
+  const youtube = google.youtube({
+    version: "v3",
+    auth: process.env.YOUTUBE_API_KEY,
+  });
+
+  try {
+    const response = await youtube.channels.list({
+      part: ["statistics"],
+      id: [channelId],
+    });
+
+    const stats = response.data.items?.[0]?.statistics;
+    const result = {  // Store in variable first
+      subscriberCount: stats?.subscriberCount || "0",
+      videoCount: stats?.videoCount || "0",
+      viewCount: stats?.viewCount || "0",
+    };
+    
+    // Cache before return
+    setCacheData(cacheKey, result, true);
+    return result;
+  } catch (error) {
+    console.error("Error fetching channel stats:", error);
+    const fallbackResult = {
+      subscriberCount: "0",
+      videoCount: "0",
+      viewCount: "0",
+    };
+    setCacheData(cacheKey, fallbackResult, true);
+    return fallbackResult;
+  }
+}
+
+// Update the function signature to specify return type
+export async function getYoutubeData(channelHandle: string): Promise<YoutubeDataResponse> {
+  const cacheKey = `data_${channelHandle}`;
+  if (isCacheValid(cacheKey)) {
+    return getCachedData<YoutubeDataResponse>(cacheKey) || {
+      videos: [],
+      allVideos: [],
+      videosByCategory: {},
+      groupedVideos: {},
+      error: "Cache miss",
+    };
+  }
+
   if (!process.env.YOUTUBE_API_KEY) {
     console.error("No API key found");
     return {
+      videos: [],
       allVideos: [],
+      videosByCategory: {},
+      groupedVideos: {},
       error: "YouTube API key is not configured",
     };
   }
@@ -48,51 +199,59 @@ export async function getYoutubeData(channelHandle: string) {
       throw new Error("No uploads playlist found");
     }
 
-    // Type Definitions
-
-    type VideoData = {
-      id: string;
-      title: string;
-      description: string;
-      thumbnail: string;
-      publishedAt: string;
-      month: string;
-      year: number;
-      isShort: boolean;
-      url: string;
-    };
-
+    // Remove the type definitions here and just use the ones from the top level
     let allVideos: VideoData[] = [];
     let nextPageToken: string | null | undefined = undefined;
 
     do {
-      // Explicitly type the response
-      const playlistItemsResponse = await youtube.playlistItems.list({
-        part: ["snippet", "contentDetails", "status"],
-        playlistId: uploadsPlaylistId,
-        maxResults: 50,
-        pageToken: nextPageToken,
-      });
+      // Update playlist items request to include contentDetails
+      const playlistItemsResponse: youtube_v3.Schema$PlaylistItemListResponse = (
+        await youtube.playlistItems.list({
+          part: ["snippet", "contentDetails", "status"],
+          playlistId: uploadsPlaylistId,
+          maxResults: 50,
+          pageToken: nextPageToken,
+        })
+      ).data;
 
-      // Extract the data property
-      const playlistItemsData: youtube_v3.Schema$PlaylistItemListResponse =
-        playlistItemsResponse.data;
+      if (playlistItemsResponse.items?.length) {
+        // Fetch video details for each batch of videos
+        const videoIds = playlistItemsResponse.items.map(
+          (item) => item.contentDetails?.videoId || ""
+        ).filter(Boolean);
 
-      if (playlistItemsData.items?.length) {
-        const videos = playlistItemsData.items.map(
+        const videoDetailsResponse = await youtube.videos.list({
+          part: ["contentDetails", "statistics"],
+          id: videoIds,
+        });
+
+        const videoDetailsMap = new Map(
+          videoDetailsResponse.data.items?.map((item) => [
+            item.id,
+            {
+              duration: item.contentDetails?.duration || "",
+              viewCount: item.statistics?.viewCount || "0",
+              likeCount: item.statistics?.likeCount || "0",
+            },
+          ])
+        );
+
+        const videos = playlistItemsResponse.items.map(
           (item: youtube_v3.Schema$PlaylistItem) => {
             const publishDate = new Date(item.snippet?.publishedAt || 0);
             const month = publishDate.toLocaleString("default", {
               month: "long",
             });
             const year = publishDate.getFullYear();
+            const videoId = item.contentDetails?.videoId || "";
+            const videoDetails = videoDetailsMap.get(videoId);
 
             const isShort =
               item.snippet?.title?.toLowerCase().includes("#shorts") ||
               item.snippet?.title?.toLowerCase().includes("short");
 
             return {
-              id: item.contentDetails?.videoId || "",
+              id: videoId,
               title: item.snippet?.title || "",
               description: item.snippet?.description || "",
               thumbnail:
@@ -103,8 +262,11 @@ export async function getYoutubeData(channelHandle: string) {
               publishedAt: item.snippet?.publishedAt || "",
               month,
               year,
-              isShort: !!isShort, // Ensure isShort is boolean
-              url: `https://youtube.com/watch?v=${item.contentDetails?.videoId}`,
+              isShort: !!isShort,
+              url: `https://youtube.com/watch?v=${videoId}`,
+              duration: videoDetails?.duration || "",
+              viewCount: videoDetails?.viewCount || "0",
+              likeCount: videoDetails?.likeCount || "0",
             };
           }
         );
@@ -112,7 +274,7 @@ export async function getYoutubeData(channelHandle: string) {
         allVideos = allVideos.concat(videos);
       }
 
-      nextPageToken = playlistItemsData.nextPageToken;
+      nextPageToken = playlistItemsResponse.nextPageToken;
     } while (nextPageToken);
 
     // Sort videos by date (newest first)
@@ -174,11 +336,11 @@ export async function getYoutubeData(channelHandle: string) {
     const totalPages = Math.ceil(totalVideos / videosPerPage);
 
     console.log("Found total videos:", totalVideos);
-    return {
-      videos: allVideos.slice(0, videosPerPage), // First page of videos
-      allVideos, // All videos stored here
-      videosByCategory, // Videos grouped by category
-      groupedVideos, // Videos grouped by category, year, and month
+    const result = {
+      videos: allVideos.slice(0, videosPerPage),
+      allVideos,
+      videosByCategory,
+      groupedVideos,
       pagination: {
         totalVideos,
         videosPerPage,
@@ -187,12 +349,20 @@ export async function getYoutubeData(channelHandle: string) {
       },
       error: null,
     };
+
+    // Cache before return
+    setCacheData(cacheKey, result);
+    return result;
   } catch (error) {
     console.error("YouTube API Error:", error);
-    return {
+    const errorResult = {
       videos: [],
-      error:
-        error instanceof Error ? error.message : "Failed to fetch YouTube data",
+      allVideos: [],
+      videosByCategory: {},
+      groupedVideos: {},
+      error: error instanceof Error ? error.message : "Failed to fetch YouTube data",
     };
+    setCacheData(cacheKey, errorResult);
+    return errorResult;
   }
 }

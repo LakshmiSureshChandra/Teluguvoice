@@ -5,6 +5,9 @@ import VideoList from "./components/VideoList";
 import { Suspense } from "react";
 import Loading from "./loading";
 
+// Import VideoData type from youtube.ts
+import type { VideoData } from "@/lib/youtube";
+
 export const metadata: Metadata = {
   title: "Facts Hive - Fascinating Facts and Knowledge Sharing | Telugu Voice",
   description:
@@ -74,7 +77,7 @@ async function MainContent() {
             <h2 className="text-2xl font-bold text-white mb-8">
               Videos of Facts Hive
             </h2>
-            <VideoList allVideos={allVideos ?? []} />
+            <VideoList allVideos={allVideos as VideoData[]} />
           </section>
         )}
       </div>

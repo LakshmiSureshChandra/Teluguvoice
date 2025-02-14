@@ -5,12 +5,44 @@ import { motion, AnimatePresence } from "framer-motion";
 import Link from 'next/link';
 import Image from 'next/image';
 
+// Add utility functions
+const formatDuration = (duration: string) => {
+  if (!duration) return "";
+  const match = duration.match(/PT(\d+H)?(\d+M)?(\d+S)?/);
+  if (!match) return "";
+  
+  const hours = (match[1] || '').replace('H', '');
+  const minutes = (match[2] || '').replace('M', '');
+  const seconds = (match[3] || '').replace('S', '');
+  
+  let result = '';
+  if (hours) result += `${hours}:`;
+  result += `${minutes.padStart(2, '0')}:`;
+  result += seconds.padStart(2, '0');
+  return result;
+};
+
+const formatNumber = (num: string) => {
+  if (!num) return "0";
+  const n = parseInt(num);
+  if (n >= 1000000) {
+    return `${(n / 1000000).toFixed(1)}M`;
+  }
+  if (n >= 1000) {
+    return `${(n / 1000).toFixed(1)}K`;
+  }
+  return n.toString();
+};
+
 interface Video {
   id: string;
   title: string;
   description: string;
   publishedAt: string;
   isShort: boolean;
+  duration: string;    // Format: "PT1H2M10S" (ISO 8601)
+  viewCount: string;
+  likeCount: string;
 }
 
 interface VideoListProps {
@@ -81,78 +113,76 @@ export default function VideoList({ allVideos }: VideoListProps) {
   return (
     <>
       {/* Tab buttons with navigation */}
-      <div className="flex justify-center items-center gap-4 mb-4">
-        <div className="flex items-center gap-4">
-          <Link
-            href="/"
-            className="p-2.5 rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors"
+      <div className="flex flex-wrap justify-center items-center gap-2 sm:gap-4 mb-4 px-2">
+        <Link
+          href="/"
+          className="p-2 sm:p-2.5 rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-4 w-4 sm:h-5 sm:w-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-              />
-            </svg>
-          </Link>
-          <button
-            onClick={() => {
-              setActiveTab("long");
-              setCurrentPage(1);
-            }}
-            className={`px-6 py-2 rounded-full transition-colors ${
-              activeTab === "long"
-                ? "bg-white/20 text-white border border-white/50"
-                : "bg-white/10 text-gray-400 hover:bg-white/15 hover:text-white"
-            }`}
-          >
-            Full Episodes
-          </button>
-          <button
-            onClick={() => {
-              setActiveTab("shorts");
-              setCurrentPage(1);
-            }}
-            className={`px-6 py-2 rounded-full transition-colors ${
-              activeTab === "shorts"
-                ? "bg-white/20 text-white border border-white/50"
-                : "bg-white/10 text-gray-400 hover:bg-white/15 hover:text-white"
-            }`}
-          >
-            Shorts
-          </button>
-          <Link
-            href="/voice-of-maheedhar"
-            className="w-10 h-10 rounded-full overflow-hidden hover:scale-110 transition-transform duration-300 shadow-lg hover:shadow-xl"
-          >
-            <Image
-              src="/Logo Square 2.png"
-              alt="Voice of Maheedhar"
-              width={40}
-              height={40}
-              className="w-full h-full object-cover"
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
             />
-          </Link>
-          <Link
-            href="/shadow-madhubabu"
-            className="w-10 h-10 rounded-full overflow-hidden hover:scale-110 transition-transform duration-300 shadow-lg hover:shadow-xl"
-          >
-            <Image
-              src="/Profile Pic.jpg"
-              alt="Shadow Madhubabu"
-              width={40}
-              height={40}
-              className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-300"
-            />
-          </Link>
-        </div>
+          </svg>
+        </Link>
+        <button
+          onClick={() => {
+            setActiveTab("long");
+            setCurrentPage(1);
+          }}
+          className={`px-3 sm:px-6 py-1.5 sm:py-2 text-sm sm:text-base rounded-full transition-colors ${
+            activeTab === "long"
+              ? "bg-white/20 text-white border border-white/50"
+              : "bg-white/10 text-gray-400 hover:bg-white/15 hover:text-white"
+          }`}
+        >
+          Full Episodes
+        </button>
+        <button
+          onClick={() => {
+            setActiveTab("shorts");
+            setCurrentPage(1);
+          }}
+          className={`px-3 sm:px-6 py-1.5 sm:py-2 text-sm sm:text-base rounded-full transition-colors ${
+            activeTab === "shorts"
+              ? "bg-white/20 text-white border border-white/50"
+              : "bg-white/10 text-gray-400 hover:bg-white/15 hover:text-white"
+          }`}
+        >
+          Shorts
+        </button>
+        <Link
+          href="/voice-of-maheedhar"
+          className="w-8 h-8 sm:w-10 sm:h-10 rounded-full overflow-hidden hover:scale-110 transition-transform duration-300 shadow-lg hover:shadow-xl"
+        >
+          <Image
+            src="/Logo Square 2.png"
+            alt="Voice of Maheedhar"
+            width={40}
+            height={40}
+            className="w-full h-full object-cover"
+          />
+        </Link>
+        <Link
+          href="/shadow-madhubabu"
+          className="w-8 h-8 sm:w-10 sm:h-10 rounded-full overflow-hidden hover:scale-110 transition-transform duration-300 shadow-lg hover:shadow-xl"
+        >
+          <Image
+            src="/Profile Pic.jpg"
+            alt="Shadow Madhubabu"
+            width={40}
+            height={40}
+            className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-300"
+          />
+        </Link>
       </div>
 
       {/* Search Bar */}
@@ -212,10 +242,37 @@ export default function VideoList({ allVideos }: VideoListProps) {
                 <h3 className="text-white text-lg font-semibold line-clamp-1">
                   {latestVideo.title}
                 </h3>
+                <div className="flex items-center gap-3 mt-2 text-sm text-gray-400">
+                  {latestVideo.duration && (
+                    <span className="flex items-center gap-1">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      {formatDuration(latestVideo.duration)}
+                    </span>
+                  )}
+                  {latestVideo.viewCount && (
+                    <span className="flex items-center gap-1">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
+                      {formatNumber(latestVideo.viewCount)}
+                    </span>
+                  )}
+                  {latestVideo.likeCount && (
+                    <span className="flex items-center gap-1">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
+                      </svg>
+                      {formatNumber(latestVideo.likeCount)}
+                    </span>
+                  )}
+                </div>
                 <p className="text-gray-300 mt-2 text-sm line-clamp-2">
                   {latestVideo.description}
                 </p>
-                <p className="text-gray-400 mt-2 text-sm">
+                <p className="text-gray-500 text-sm mt-2">
                   {new Date(latestVideo.publishedAt).toLocaleDateString()}
                 </p>
               </div>
@@ -287,6 +344,33 @@ export default function VideoList({ allVideos }: VideoListProps) {
                       <h3 className="text-white font-semibold line-clamp-2">
                         {video.title}
                       </h3>
+                      <div className="flex items-center gap-3 mt-2 text-sm text-gray-400">
+                        {video.duration && (
+                          <span className="flex items-center gap-1">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            {formatDuration(video.duration)}
+                          </span>
+                        )}
+                        {video.viewCount && (
+                          <span className="flex items-center gap-1">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                            {formatNumber(video.viewCount)}
+                          </span>
+                        )}
+                        {video.likeCount && (
+                          <span className="flex items-center gap-1">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
+                            </svg>
+                            {formatNumber(video.likeCount)}
+                          </span>
+                        )}
+                      </div>
                       <p className="text-gray-400 mt-2 text-sm line-clamp-3">
                         {video.description}
                       </p>

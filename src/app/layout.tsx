@@ -1,7 +1,12 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import ContactButton from '@/components/ContactButton';
+import GoogleAnalytics from '@/components/GoogleAnalytics';
+import { startCronJob } from '@/lib/cron';
+import CacheTimer from '@/components/CacheTimer';
 
+// Initialize fonts
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -11,6 +16,31 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
+
+// Start the cron job when the app initializes
+if (process.env.NODE_ENV === 'production') {
+  startCronJob();
+}
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html
+      lang="en"
+      className={`${geistSans.variable} ${geistMono.variable}`}
+    >
+      <GoogleAnalytics />
+      <body>
+        {children}
+        <ContactButton />
+        <CacheTimer />
+      </body>
+    </html>
+  );
+}
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://teluguvoice.vercel.app"),
@@ -75,20 +105,3 @@ export const metadata: Metadata = {
     },
   },
 };
-
-import ContactButton from '@/components/ContactButton';
-
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
-      <body>
-        {children}
-        <ContactButton />
-      </body>
-    </html>
-  );
-}

@@ -1,4 +1,4 @@
-import { getYoutubeData } from "@/lib/youtube";
+import { getYoutubeData, VideoData } from "@/lib/youtube";
 import VideoList from "./components/VideoList";
 import { Suspense } from "react";
 import Loading from "./loading";
@@ -75,9 +75,9 @@ async function MainContent() {
         ) : (
           <section className="mb-16">
             <h2 className="text-2xl font-bold text-white mb-8">
-              Vidoes of Shadow Madhubabu Audiobooks
+              Videos of Shadow Madhubabu Audiobooks
             </h2>
-            <VideoList allVideos={allVideos ?? []} />
+            <VideoList allVideos={allVideos as VideoData[] ?? []} />
           </section>
         )}
       </div>
