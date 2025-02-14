@@ -4,7 +4,6 @@ import "./globals.css";
 import ContactButton from '@/components/ContactButton';
 import GoogleAnalytics from '@/components/GoogleAnalytics';
 import { startCronJob } from '@/lib/cron';
-import CacheTimer from '@/components/CacheTimer';
 
 // Initialize fonts
 const geistSans = Geist({
@@ -36,7 +35,6 @@ export default function RootLayout({
       <body>
         {children}
         <ContactButton />
-        <CacheTimer />
       </body>
     </html>
   );

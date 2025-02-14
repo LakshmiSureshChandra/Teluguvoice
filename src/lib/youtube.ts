@@ -1,6 +1,4 @@
 import { google, youtube_v3 } from "googleapis"; // Import youtube_v3 to use the type for the response
-
-
     // Type Definitions
     // Move VideoData type to the top level
     // Add export to the VideoData type at the top level
@@ -20,11 +18,12 @@ import { google, youtube_v3 } from "googleapis"; // Import youtube_v3 to use the
     };
 // Add this type at the top with other type definitions
 // Separate types for different cache data types
+// Update YoutubeDataResponse type to use VideoData
 type YoutubeDataResponse = {
-  videos: unknown[];
-  allVideos: unknown[];
-  videosByCategory: Record<string, unknown[]>;
-  groupedVideos: Record<string, unknown>;
+  videos: VideoData[];
+  allVideos: VideoData[];
+  videosByCategory: Record<string, VideoData[]>;
+  groupedVideos: Record<string, Record<string, { year: number; months: Record<string, { videos: VideoData[] }> }>>;
   pagination?: {
     totalVideos: number;
     videosPerPage: number;
@@ -46,24 +45,26 @@ type CacheData<T> = {
 };
 
 // Separate caches for different types of data
+// Simplified caching
 const statsCache: { [key: string]: CacheData<ChannelStats> } = {};
 const dataCache: { [key: string]: CacheData<YoutubeDataResponse> } = {};
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
 
-// Update cache functions to be type-safe
 function isCacheValid(key: string, isStats: boolean = false): boolean {
   const cacheEntry = isStats ? statsCache[key] : dataCache[key];
-  if (!cacheEntry) {
+  if (!cacheEntry || !cacheEntry.timestamp) {
     console.log(`Cache miss for ${key}`);
     return false;
   }
-  const isValid = Date.now() - cacheEntry.timestamp < CACHE_DURATION;
+  const now = Date.now();
+  const cacheAge = now - cacheEntry.timestamp;
+  const isValid = cacheAge < CACHE_DURATION;
   console.log(`Cache ${isValid ? 'hit' : 'expired'} for ${key}`);
   return isValid;
 }
 
-// Update the setCacheData function with constrained generic type
-// Update setCacheData to handle different cache types correctly
+// Remove duplicate setCacheData function and timer-related code
+// Keep only one version of setCacheData
 function setCacheData(
   key: string,
   data: YoutubeDataResponse | ChannelStats,
@@ -83,7 +84,6 @@ function setCacheData(
   console.log(`Cache updated for ${key}`);
 }
 
-// Update getCachedData to be type-safe
 function getCachedData<T extends YoutubeDataResponse | ChannelStats>(
   key: string,
   isStats: boolean = false
@@ -92,10 +92,30 @@ function getCachedData<T extends YoutubeDataResponse | ChannelStats>(
   return cache?.data as T;
 }
 
+// Keep only this version of getCacheTimestamp
+// Update getCacheTimestamp function
 export function getCacheTimestamp(key: string, isStats: boolean = false): number {
   const cache = isStats ? statsCache : dataCache;
-  return cache[key]?.timestamp || Date.now();
+  const entry = cache[key];
+  return entry?.timestamp ?? Date.now();
 }
+
+// Update the setCacheData function with constrained generic type
+// Update setCacheData to handle different cache types correctly
+// Add these functions at the top after type definitions
+function loadCache() {
+  try {
+    const savedStatsCache = localStorage.getItem('statsCache');
+    const savedDataCache = localStorage.getItem('dataCache');
+    if (savedStatsCache) Object.assign(statsCache, JSON.parse(savedStatsCache));
+    if (savedDataCache) Object.assign(dataCache, JSON.parse(savedDataCache));
+  } catch (e) {
+    console.error('Error loading cache:', e);
+  }
+}
+
+// Add this line after cache initialization
+if (typeof window !== 'undefined') loadCache();
 
 export async function getChannelStats(channelId: string): Promise<ChannelStats> {
   const cacheKey = `stats_${channelId}`;
